@@ -52,16 +52,20 @@ dvec2 P1(in dvec2 pos){
 	return dvec2(-pos.x*pos.x+pos.y*pos.y-pos.x,2*pos.x*pos.y-pos.y);
 }
 
+dvec3 getpos(in vec2 xy){
+
+	double relative_x = xy.x / double(screeny);
+	double relative_y = xy.y / double(screeny);
+
+	return dvec3(dvec2((relative_x - 0.5 * double(screenx)/double(screeny)) * scalex, (relative_y - 0.5) * scaley) + viewport.xy, viewport.z);
+}
+
 vec4 variety()
 {
-
-	double relative_x = gl_FragCoord.x / double(screenx);
-	double relative_y = gl_FragCoord.y / double(screeny);
-	
 	double dx = double(thickness)/2.0*scalex/double(screenx);
 	double dy = double(thickness)/2.0*scaley/double(screeny);
 
-	dvec3 pos = dvec3(dvec2((relative_x - 0.5) * scalex, (relative_y - 0.5) * scaley) + viewport.xy, viewport.z);
+	dvec3 pos = getpos(gl_FragCoord.xy);	
 	dvec3 posdx = pos + dvec3(dx, 0, 0);
 	dvec3 pos_dx = pos - dvec3(dx, 0, 0);
 	dvec3 posdy = pos + dvec3(0, dy, 0);
@@ -76,9 +80,8 @@ vec4 variety()
 		pos_dy = P3(pos_dy);
 
 		if ((sign(posdx.x-a) != sign(pos_dx.x-a)) || (sign(posdy.x-a) != sign(pos_dy.x-a))) {
-
 			//gl_FragColor = texture2D(color, dvec2(float(k)/float(iterations),0));
-			//gl_FragColor = texture2D(color, dvec2(float(k)/float(maxiter),0));
+		//gl_FragColor = texture2D(color, dvec2(float(k)/float(maxiter),0));
 			return vec4(0, 0, 0, 1);
 		}
 
@@ -91,13 +94,7 @@ vec4 variety()
 vec4 coloringmain()
 {
 
-	double relative_x = gl_FragCoord.x / double(screenx);
-	double relative_y = gl_FragCoord.y / double(screeny);
-	
-	double dx = thickness/2.0*scalex/double(screenx);
-	double dy = thickness/2.0*scaley/double(screeny);
-
-	dvec3 pos = dvec3(dvec2((relative_x - 0.5) * scalex, (relative_y - 0.5) * scaley) + viewport.xy, viewport.z);
+	dvec3 pos = getpos(gl_FragCoord.xy);
 
 	for(int k = 0; k < iterations; k++){
 	
@@ -122,13 +119,10 @@ vec4 coloringmain()
 vec4 combined()
 {
 
-	double relative_x = gl_FragCoord.x / double(screenx);
-	double relative_y = gl_FragCoord.y / double(screeny);
-	
 	double dx = double(thickness)/2.0*scalex/double(screenx);
 	double dy = double(thickness)/2.0*scaley/double(screeny);
 
-	dvec3 pos = dvec3(dvec2((relative_x - 0.5) * scalex, (relative_y - 0.5) * scaley) + viewport.xy, viewport.z);
+	dvec3 pos = getpos(gl_FragCoord.xy);
 	dvec3 posdx = pos + dvec3(dx, 0, 0);
 	dvec3 pos_dx = pos - dvec3(dx, 0, 0);
 	dvec3 posdy = pos + dvec3(0, dy, 0);
@@ -170,14 +164,10 @@ vec4 combined()
 
 vec4 dreieck(){
 
+	double dx = double(thickness)/2.0*scalex/double(screenx);
+	double dy = double(thickness)/2.0*scaley/double(screeny);
 
-	double relative_x = gl_FragCoord.x / double(screenx);
-	double relative_y = gl_FragCoord.y / double(screeny);
-	
-	double dx = thickness/2.0*scalex/double(screenx);
-	double dy = thickness/2.0*scaley/double(screeny);
-
-	dvec3 pos = dvec3(dvec2((relative_x - 0.5) * scalex, (relative_y - 0.5) * scaley) + viewport.xy, viewport.z);
+	dvec3 pos = getpos(gl_FragCoord.xy);
 	dvec3 posdx = pos + dvec3(dx, 0, 0);
 	dvec3 pos_dx = pos - dvec3(dx, 0, 0);
 	dvec3 posdy = pos + dvec3(0, dy, 0);
@@ -217,15 +207,11 @@ vec4 dreieck(){
 
 
 vec4 mandelbrot(){
-
-
-	double relative_x = gl_FragCoord.x / double(screenx);
-	double relative_y = gl_FragCoord.y / double(screeny);
 	
 	double dx = thickness/2.0*scalex/double(screenx);
 	double dy = thickness/2.0*scaley/double(screeny);
 
-	dvec2 pos0 = dvec2((relative_x - 0.5) * scalex, (relative_y - 0.5) * scaley) + viewport.xy;
+	dvec2 pos0 = getpos(gl_FragCoord.xy).xy;
 	dvec2 pos = pos0;
 
 	dvec2 posdx = pos + dvec2(dx, 0);
@@ -265,43 +251,30 @@ vec4 mandelbrot(){
 
 }
 
-vec4 custom(){
-
-	double relative_x = gl_FragCoord.x / double(screenx);
-	double relative_y = gl_FragCoord.y / double(screeny);
+vec4 cringe(){
 	
 	double dx = double(thickness)/2.0*scalex/double(screenx);
 	double dy = double(thickness)/2.0*scaley/double(screeny);
 
-	dvec2 pos = dvec2((relative_x - 0.5) * scalex, (relative_y - 0.5) * scaley) + viewport.xy;
+	dvec2 pos = getpos(gl_FragCoord.xy).xy;	
 	dvec2 posdx = pos + dvec2(dx, 0);
 	dvec2 pos_dx = pos - dvec2(dx, 0);
 	dvec2 posdy = pos + dvec2(0, dy);
 	dvec2 pos_dy = pos - dvec2(0, dy);
 
-	for(int k = 0; k < iterations; k++){
 
-		pos = C(pos);
+	for(int k = 0; k < iterations; k++){
+		
 		posdx = C(posdx);
 		pos_dx = C(pos_dx);
 		posdy = C(posdy);
 		pos_dy = C(pos_dy);
 
-		if ((posdx.x-a) * (pos_dx.x-a) < 0.0 || (posdy.x-a) * (pos_dy.x-a) < 0.0) {
+		if ((sign(posdx.x-a) != sign(pos_dx.x-a)) || (sign(posdy.x-a) != sign(pos_dy.x-a))) {
 
-			//gl_FragColor = texture2D(color, dvec2(float(k)/float(iterations),0));
-			//gl_FragColor = texture2D(color, dvec2(float(k)/float(maxiter),0));
-			return vec4(1.0, 0.6, 0, 1);
+			return vec4(0, 0, 0, 1);
 		}
-//		if (length(pos) > 1000) {
-//
-//			return vec4(1.0/sqrt(float(k)), 0, 0, 1);
-//		
-//		}
-//		else if(abs(pos.y) < margin ){
-//			return vec4(0, 1.0/sqrt(float(k)), 0, 1);
-//		}
-//
+
 	}
 
 	return vec4(1,1,1,1);
@@ -312,13 +285,10 @@ vec4 custom(){
  vec4 oldie()
 {
 
-	double relative_x = gl_FragCoord.x / double(screenx);
-	double relative_y = gl_FragCoord.y / double(screeny);
-//	
 //	double dx = double(thickness)/2.0*scalex/double(screenx);
 //	double dy = double(thickness)/2.0*scaley/double(screeny);
 
-	dvec2 pos = dvec2((relative_x - 0.5) * scalex, (relative_y - 0.5) * scaley) + viewport.xy;
+	dvec2 pos = getpos(gl_FragCoord.xy).xy;
 //	dvec2 posdx = pos + dvec2(dx, 0);
 //	dvec2 pos_dx = pos - dvec2(dx, 0);
 //	dvec2 posdy = pos + dvec2(0, dy);
@@ -378,7 +348,7 @@ void main(){
 
 	case 5:
 	{
-		gl_FragColor = custom();
+		gl_FragColor = cringe();
 		break;
 	}
 

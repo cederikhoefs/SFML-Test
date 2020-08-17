@@ -92,7 +92,7 @@ public:
 		shader.setUniform("screeny", height);
 
 		shader.setUniform("scalex", scalex);
-		shader.setUniform("scaley", scalex);
+		shader.setUniform("scaley", scaley);
 
 		shader.setUniform("thickness", thickness);
 		shader.setUniform("margin", margin);
@@ -141,7 +141,8 @@ int main()
 				break;
 
 			case Event::Resized:
-
+				test.width = window.getSize().x;
+				test.height = window.getSize().y;
 				break;
 
 			case Event::MouseButtonPressed:
@@ -151,7 +152,7 @@ int main()
 					break;
 
 				Vector2i m = Mouse::getPosition(window);
-				Vector2d r = Vector2d(m.x / 1000.0, m.y / 1000.0);
+				Vector2d r = Vector2d((double)m.x / window.getSize().y, (double)m.y / window.getSize().y);
 				Vector2d v = Vector2d((r.x - 0.5) * test.scalex, (0.5 - r.y) * test.scaley);
 
 				grabstart = Vector2d(test.viewport.x, test.viewport.y) + v;
@@ -174,7 +175,8 @@ int main()
 					break;
 				if (Mouse::isButtonPressed(Mouse::Left) && grabbed) {
 					Vector2i m = Mouse::getPosition(window);
-					Vector2d r = Vector2d(m.x / 1000.0, m.y / 1000.0);
+					Vector2d r = Vector2d((double)m.x / window.getSize().y, (double)m.y / window.getSize().y);
+
 					Vector2d v = Vector2d((r.x - 0.5) * test.scalex, (0.5 - r.y) * test.scaley);
 
 					grabend = Vector2d(test.viewport.x, test.viewport.y) + v;
@@ -207,8 +209,8 @@ int main()
 
 				case Keyboard::W:
 				{
-					test.scalex *= 0.5;
-					test.scaley *= 0.5;
+					test.scalex *= 0.98;
+					test.scaley *= 0.98;
 					cout << "Scale: (" << test.scalex << "|" << test.scaley << ")" << endl;
 					test.update();
 					break;
@@ -275,7 +277,7 @@ int main()
 
 		ImGui::Begin("Parameters");
 
-		ImGui::Text("Scale: %.5e", test.scalex);
+		//ImGui::Text("Scale: %.5e", test.scalex);
 		
 		ImGui::SliderInt("k", &test.iterations, 1, 4096);
 		ImGui::SliderFloat("z", &test.viewport.z, -5.0, 5.0);
